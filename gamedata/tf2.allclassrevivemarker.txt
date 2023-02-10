@@ -1,0 +1,36 @@
+"Games"
+{
+	"tf"
+	{	
+		"Functions"
+		{
+			"CTFReviveMarker::AddMarkerHealth()"
+			{
+				"signature"		"CTFReviveMarker::AddMarkerHealth()"
+				"callconv"		"thiscall"
+				"this"			"entity"
+				"return"		"void"
+
+				"arguments"
+				{
+					"flAmount"
+					{
+						"type"	"float"
+					}
+				}
+			}
+		}
+		
+		"Signatures"
+		{
+			"CTFReviveMarker::AddMarkerHealth()"
+			{
+				// Find aRevivePlayerCo which only CTFReviveMarker::ReviveOwner uses. There are only two functions that call ::ReviveOwner and one of them is ::AddMarkerHealth.
+				"library"	"server"
+				"linux"		"@_ZN15CTFReviveMarker15AddMarkerHealthEf"
+				"windows"	"\x55\x8B\xEC\x56\x8B\xF1\x57\x8B\xBE\xB0\x04\x00\x00"
+			}
+
+		}
+	}
+}
