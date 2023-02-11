@@ -1,7 +1,7 @@
 <div align="center">
   <h1><code>AllClassReviveMarker</code></h1>
   <p>
-    <strong>Short Description</strong>
+    <strong>Give the ability to revive dead teammates from their graves ( revive markers ) to every class and not just the medic.</strong>
   </p>
   <p style="margin-bottom: 0.5ex;">
     <img
@@ -27,17 +27,14 @@
 
 
 ## Requirements ##
-- Sourcemod and Metamod
+- [Stocksoup ( Compile Only )](https://github.com/nosoop/stocksoup)
 
 
 ## Installation ##
 1. Grab the latest release from the release page and unzip it in your sourcemod folder.
 2. Restart the server or type `sm plugins load AllClassReviveMarker` in the console to load the plugin.
-3. The config file will be automatically generated in cfg/sourcemod/
-
-## Configuration ##
-- You can modify the phrases in addons/sourcemod/translations/AllClassReviveMarker.phrases.txt.
-- Once the plugin has been loaded, you can modify the cvars in cfg/sourcemod/AllClassReviveMarker.cfg.
 
 
-## Usage ##
+## Convars ##
+- **sm_allclassrevivemarker_revivedistance**: Dictates the maximum distance between the client and the revive marker while reviving.
+- **sm_allclassrevivemarker_reviverate**: Dictates the amount of healing done every frame.
