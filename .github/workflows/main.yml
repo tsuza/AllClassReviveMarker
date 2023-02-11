@@ -15,6 +15,10 @@ jobs:
 
       - name: Set environment variables
         run: echo SCRIPTS_PATH=$(pwd) >> $GITHUB_ENV
+
+      - name: Install zip
+        uses: montudor/action-zip@v1
+
       - name: Setup SourcePawn Compiler ${{ matrix.SM_VERSION }}
         id: setup_sp
         uses: rumblefrog/setup-sp@master
@@ -44,9 +48,6 @@ jobs:
       - name: Changelog
         id: changelog
         uses: mindsers/changelog-reader-action@v2.0.0
-
-      - name: Install zip
-        uses: montudor/action-zip@v1
 
       - name: Zip output
         run: |
