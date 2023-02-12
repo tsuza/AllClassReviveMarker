@@ -51,7 +51,7 @@ jobs:
 
       - name: Zip output
         run: |
-          zip -qq -y -r AllClassReviveMarker-${{ steps.setup_sp.outputs.plugin-version }}.zip plugins scripting gamedata -x scripting/include
+          zip -qq -y -r AllClassReviveMarker-${{ steps.setup_sp.outputs.plugin-version }}.zip plugins scripting gamedata -x "scripting/include/*"
         working-directory: ${{ env.SCRIPTS_PATH }}
 
       - name: Create Release
