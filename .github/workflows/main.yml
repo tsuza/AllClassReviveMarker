@@ -43,6 +43,7 @@ jobs:
           ls
           echo "===VERSION==="
           echo ${{ steps.setup_sp.outputs.plugin-version }}
+          cd ..
         working-directory: ${{ env.SCRIPTS_PATH }}
 
       - name: Changelog
