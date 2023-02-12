@@ -61,7 +61,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag: v${{ steps.setup_sp.outputs.plugin-version }}
-          artifacts: "./plugins/AllClassReviveMarker-${{ steps.setup_sp.outputs.plugin-version }}.zip"
+          artifacts: "./AllClassReviveMarker-${{ steps.setup_sp.outputs.plugin-version }}.zip"
           body: ${{ steps.changelog.outputs.changes }}
           draft: false
           allowUpdates: true
