@@ -1,7 +1,7 @@
 <div align="center">
   <h1><code>AllClassReviveMarker</code></h1>
   <p>
-    <strong>Give the ability to revive dead teammates from their graves ( revive markers ) to every class and not just the medic.</strong>
+    <strong>Give the ability to every class ( and not just the medic ) to revive dead teammates from their revive marker.</strong>
   </p>
   <p style="margin-bottom: 0.5ex;">
     <img
@@ -24,6 +24,10 @@
     />
   </p>
 </div>
+
+## Demonstration ##
+
+https://user-images.githubusercontent.com/73082112/219214018-0247e11f-34e5-4861-a02a-c4a2d0bfbeb0.mp4
 
 
 ## Requirements ##
