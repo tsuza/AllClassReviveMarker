@@ -1,0 +1,8 @@
+[Compile]
+plugins = [
+    "AllClassReviveMarker"
+]
+
+[[dependency]]
+url = "https://github.com/nosoop/stocksoup"
+path = "stocksoup"

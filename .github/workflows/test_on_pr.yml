@@ -1,0 +1,58 @@
+name: Compile and test against PR
+
+on:
+  pull_request:
+    branches: master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    permissions:
+      contents: write
+
+    steps:
+      - name: Set environment variables
+        run: |
+          echo SCRIPTS_PATH=$(pwd) >> $GITHUB_ENV
+          echo PLUGIN_NAME_ENV=${{ github.repository }} >> $GITHUB_ENV
+
+      - uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v2
+
+      - name: Install the go scripts
+        run: |
+          wget "https://raw.githubusercontent.com/Zabaniya001/SPDependy/660cf458055804d1defb258a1d774291e61bd1e2/main.go"
+          wget "https://raw.githubusercontent.com/Zabaniya001/SPDependy/660cf458055804d1defb258a1d774291e61bd1e2/go.mod"
+          wget "https://raw.githubusercontent.com/Zabaniya001/SPDependy/660cf458055804d1defb258a1d774291e61bd1e2/go.sum"
+        working-directory: ${{ env.SCRIPTS_PATH }}
+
+      - name: Install dependencies
+        run: go mod download
+        working-directory: ${{ env.SCRIPTS_PATH }}
+
+      - name: Setup SourcePawn Compiler ${{ matrix.SM_VERSION }}
+        id: setup_sp
+        uses: rumblefrog/setup-sp@master
+        with:
+          version: "1.11.x"
+          version-file: ./scripting/${{ env.PLUGIN_NAME_ENV }}.sp
+      
+      - name: Install SourcePawn includes.
+        run: go run main.go ${{ secrets.GITHUB_TOKEN }}
+        working-directory: ${{ env.SCRIPTS_PATH }}
+
+      - name: Install linux dependency for toml
+        run: |
+          sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Compile plugins
+        run: |
+          mkdir ../plugins
+          for plugin in $(jq -r '.Compile.plugins[]' ../sp.toml); do
+            spcomp -w234 -O2 -v2 -i"include" -o"../plugins/${plugin}.smx" "${plugin}.sp"
+          done
+        working-directory: ${{ env.SCRIPTS_PATH }}/scripting

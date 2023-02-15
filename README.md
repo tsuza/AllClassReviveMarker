@@ -38,3 +38,6 @@
 ## Convars ##
 - **sm_allclassrevivemarker_revivedistance**: Dictates the maximum distance between the client and the revive marker while reviving.
 - **sm_allclassrevivemarker_reviverate**: Dictates the amount of healing done every frame.
+
+## Build ##
+This plugin gets built by my other project [SPDependy](https://www.github.com/Zabaniya001/SPDependy)
