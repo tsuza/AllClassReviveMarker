@@ -1,0 +1,88 @@
+name: Compile and release
+
+on:
+  push:
+    branches: master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set environment variables
+        run: |
+          echo "SCRIPTS_PATH=$(pwd)" >> $GITHUB_ENV
+          echo "PLUGIN_NAME_ENV=${{ github.event.repository.name }}" >> $GITHUB_ENV
+
+      - name: Check commit message
+        run: |
+          commit_message=$(git log -1 --format='%B' ${{ github.sha }})
+          if echo $commit_message | grep -q '\[ci\]'; then
+            echo "Commit message contains [ci], stopping workflow"
+            exit 1
+          fi
+
+      - name: Set up Go
+        uses: actions/setup-go@v2
+
+      - name: Install the go scripts
+        run: |
+          wget "https://raw.githubusercontent.com/Zabaniya001/SPDependy/660cf458055804d1defb258a1d774291e61bd1e2/main.go"
+          wget "https://raw.githubusercontent.com/Zabaniya001/SPDependy/660cf458055804d1defb258a1d774291e61bd1e2/go.mod"
+          wget "https://raw.githubusercontent.com/Zabaniya001/SPDependy/660cf458055804d1defb258a1d774291e61bd1e2/go.sum"
+        working-directory: ${{ env.SCRIPTS_PATH }}
+
+      - name: Install dependencies
+        run: go mod download
+        working-directory: ${{ env.SCRIPTS_PATH }}
+
+      - name: Setup SourcePawn Compiler ${{ matrix.SM_VERSION }}
+        id: setup_sp
+        uses: rumblefrog/setup-sp@master
+        with:
+          version: "1.11.x"
+          version-file: ./scripting/${{ env.PLUGIN_NAME_ENV }}.sp
+      
+      - name: Install SourcePawn includes.
+        run: go run main.go ${{ secrets.GITHUB_TOKEN }}
+        working-directory: ${{ env.SCRIPTS_PATH }}
+
+      - name: Install linux dependency for toml
+        run: |
+          sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Compile plugins
+        run: |
+          mkdir ../plugins
+          for plugin in $(jq -r '.Compile.plugins[]' ../sp.toml); do
+            spcomp -w234 -O2 -v2 -i"include" -o"../plugins/${plugin}.smx" "${plugin}.sp"
+          done
+        working-directory: ${{ env.SCRIPTS_PATH }}/scripting
+
+      - name: Install zip
+        uses: montudor/action-zip@v1
+
+      - name: Zip output
+        run: |
+          zip -qq -y -r ${{ github.event.repository.name }}-${{ steps.setup_sp.outputs.plugin-version }}.zip configs plugins scripting extensions gamedata translations data -x "scripting/include/*"
+        working-directory: ${{ env.SCRIPTS_PATH }}
+
+      - name: Create Release
+        uses: ncipollo/release-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag: v${{ steps.setup_sp.outputs.plugin-version }}
+          artifacts: "./${{ github.event.repository.name }}-${{ steps.setup_sp.outputs.plugin-version }}.zip"
+          body: ${{ steps.changelog.outputs.changes }}
+          draft: false
+          allowUpdates: true
+          prerelease: false
+          replacesArtifacts: true
