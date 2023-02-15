@@ -30,9 +30,12 @@
 https://user-images.githubusercontent.com/73082112/219214018-0247e11f-34e5-4861-a02a-c4a2d0bfbeb0.mp4
 
 
+## How to use in game? ##
+Look at a friendly revive marker and press R to start reviving. It'll keep reviving as long as you're close to it ( once you've started reviving, you don't necessarily need to keep looking at it ).
+
+
 ## Requirements ##
 - [Stocksoup ( Compile Only )](https://github.com/nosoop/stocksoup)
-
 
 ## Installation ##
 1. Grab the latest release from the release page and unzip it in your sourcemod folder.
