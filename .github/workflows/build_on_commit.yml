@@ -11,6 +11,7 @@ jobs:
       fail-fast: false
     permissions:
       contents: write
+    if: "!contains(github.event.head_commit.message, '[ci]')"
 
     steps:
       - uses: actions/checkout@v3
@@ -20,28 +21,6 @@ jobs:
           echo "SCRIPTS_PATH=$(pwd)" >> $GITHUB_ENV
           echo "PLUGIN_NAME_ENV=${{ github.event.repository.name }}" >> $GITHUB_ENV
 
-      - name: Check commit message
-        run: |
-          commit_message=$(git log -1 --format='%B' ${{ github.sha }})
-          if echo $commit_message | grep -q '\[ci\]'; then
-            echo "Commit message contains [ci], stopping workflow"
-            exit 1
-          fi
-
-      - name: Set up Go
-        uses: actions/setup-go@v2
-
-      - name: Install the go scripts
-        run: |
-          wget "https://raw.githubusercontent.com/Zabaniya001/SPDependy/660cf458055804d1defb258a1d774291e61bd1e2/main.go"
-          wget "https://raw.githubusercontent.com/Zabaniya001/SPDependy/660cf458055804d1defb258a1d774291e61bd1e2/go.mod"
-          wget "https://raw.githubusercontent.com/Zabaniya001/SPDependy/660cf458055804d1defb258a1d774291e61bd1e2/go.sum"
-        working-directory: ${{ env.SCRIPTS_PATH }}
-
-      - name: Install dependencies
-        run: go mod download
-        working-directory: ${{ env.SCRIPTS_PATH }}
-
       - name: Setup SourcePawn Compiler ${{ matrix.SM_VERSION }}
         id: setup_sp
         uses: rumblefrog/setup-sp@master
@@ -49,8 +28,14 @@ jobs:
           version: "1.11.x"
           version-file: ./scripting/${{ env.PLUGIN_NAME_ENV }}.sp
       
-      - name: Install SourcePawn includes.
-        run: go run main.go ${{ secrets.GITHUB_TOKEN }}
+      - name: Download the includes downloader
+        run: |
+          curl -LJO -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" -H "Accept: application/octet-stream" "https://github.com/Zabaniya001/SPDependy/releases/latest/download/SPDependyLinux"
+          chmod +x SPDependyLinux
+        working-directory: ${{ env.SCRIPTS_PATH }}
+      
+      - name: Install the SourcePawn includes.
+        run: ./SPDependyLinux ${{ secrets.GITHUB_TOKEN }}
         working-directory: ${{ env.SCRIPTS_PATH }}
 
       - name: Install linux dependency for toml
@@ -59,18 +44,18 @@ jobs:
 
       - name: Compile plugins
         run: |
-          mkdir ../plugins
-          for plugin in $(jq -r '.Compile.plugins[]' ../sp.toml); do
-            spcomp -w234 -O2 -v2 -i"include" -o"../plugins/${plugin}.smx" "${plugin}.sp"
+          mkdir plugins
+          for plugin in $(jq -r '.Compile.plugins[]' sp.toml); do
+            spcomp -w234 -O2 -v2 -i"scripting/include" -i".temp/include" -o"plugins/${plugin}.smx" "scripting/${plugin}.sp"
           done
-        working-directory: ${{ env.SCRIPTS_PATH }}/scripting
+        working-directory: ${{ env.SCRIPTS_PATH }}
 
       - name: Install zip
         uses: montudor/action-zip@v1
 
       - name: Zip output
         run: |
-          zip -qq -y -r ${{ github.event.repository.name }}-${{ steps.setup_sp.outputs.plugin-version }}.zip configs plugins scripting extensions gamedata translations data -x "scripting/include/*"
+          zip -qq -y -r ${{ github.event.repository.name }}-${{ steps.setup_sp.outputs.plugin-version }}.zip configs plugins scripting extensions gamedata translations data
         working-directory: ${{ env.SCRIPTS_PATH }}
 
       - name: Create Release
