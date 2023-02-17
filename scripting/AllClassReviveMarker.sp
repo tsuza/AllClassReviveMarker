@@ -16,12 +16,13 @@ public Plugin myinfo =
 	name         =  "[TF2] AllClassReviveMarker",
 	author       =  "Zabaniya001",
 	description  =  "[TF2] Allows every class to revive players from revive markers.",
-	version      =  "1.0.0",
+	version      =  "1.0.1",
 	url          =  "https://github.com/Zabaniya001/AllClassReviveMarker"
 };
 
 ConVar g_convar_distance;
 ConVar g_convar_reviverate;
+ConVar g_convar_spawnReviveMarker;
 
 int g_CTFReviveMarker_pReviver;
 int g_CTFReviveMarker_bOwnerPromptedToRevive;
@@ -32,6 +33,7 @@ public void OnPluginStart()
 {
 	g_convar_distance   =  CreateConVar("sm_allclassrevivemarker_revivedistance", "120.0", "Dictates the maximum distance between the client and the revive marker while reviving");
 	g_convar_reviverate =  CreateConVar("sm_allclassrevivemarker_reviverate", "0.2", "Dictates the amount of healing done every frame ( this is close to medic's revive rate )");
+	g_convar_spawnReviveMarker = CreateConVar("sm_allclassrevivemarker_spawnrevivemarker", "0", "It decides whether or not the revive markers should spawn. 0 ( default value ) - Doesn't spawn revive markers | 1 - Spawns for all teams | 2 - Spawns only for red team | 3 - Spawns only for blue team");
 
 	int CTFReviveMarker_nRevives = FindSendPropInfo("CTFReviveMarker", "m_nRevives");
 
@@ -89,6 +91,14 @@ public void OnClientPutInServer(int client)
 void OnTakeDamagePost(int victim, int attacker, int inflictor, float damage, int damagetype)
 {
 	if(GetClientHealth(victim) > 0.0)
+		return;
+	
+	if(!g_convar_spawnReviveMarker.IntValue)
+		return;
+	
+	int victim_team = GetClientTeam(victim);
+	
+	if(g_convar_spawnReviveMarker.IntValue != 1 && g_convar_spawnReviveMarker.IntValue != victim_team)
 		return;
 	
 	SpawnReviveMarker(victim);
