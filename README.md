@@ -43,8 +43,9 @@ Look at a friendly revive marker and press R to start reviving. It'll keep reviv
 
 
 ## Convars ##
-- **sm_allclassrevivemarker_revivedistance**: Dictates the maximum distance between the client and the revive marker while reviving.
-- **sm_allclassrevivemarker_reviverate**: Dictates the amount of healing done every frame.
+- **sm_allclassrevivemarker_revivedistance**: Dictates the maximum distance between the client and the revive marker while reviving. DEFAULT: 120.0
+- **sm_allclassrevivemarker_reviverate**: Dictates the amount of healing done every frame. DEFAULT: 0.2 ( close to medigun, more or less )
+- **sm_allclassrevivemarker_spawnrevivemarker**: Controls what team spawns the revive marker. 0 doesn't make the revive markers spawn, 1 makes them spawn for all teams, 2 only red, 3 only blue. DEFAULT: 0
 
 ## Build ##
 This plugin gets built by my other project [SPDependy](https://www.github.com/Zabaniya001/SPDependy)
