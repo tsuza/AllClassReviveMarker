@@ -30,9 +30,11 @@ jobs:
       
       - name: Download the includes downloader
         run: |
-          curl -LJO -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" -H "Accept: application/octet-stream" "https://github.com/Zabaniya001/SPDependy/releases/latest/download/SPDependyLinux"
+          gh release download --repo Zabaniya001/SPDependy --pattern "SPDependyLinux"
           chmod +x SPDependyLinux
         working-directory: ${{ env.SCRIPTS_PATH }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       
       - name: Install the SourcePawn includes.
         run: ./SPDependyLinux ${{ secrets.GITHUB_TOKEN }}
