@@ -40,14 +40,19 @@ jobs:
         run: ./SPDependyLinux ${{ secrets.GITHUB_TOKEN }}
         working-directory: ${{ env.SCRIPTS_PATH }}
 
-      - name: Install linux dependency for toml
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Download toml parser
         run: |
-          sudo apt-get update && sudo apt-get install -y jq
+          pip install jq
+          pip install yq
 
       - name: Compile plugins
         run: |
           mkdir plugins
-          for plugin in $(jq -r '.Compile.plugins[]' sp.toml); do
+          for plugin in $(tomlq '.Compile.plugins[]' sp.toml | cut -d'"' -f2); do
             spcomp -w234 -O2 -v2 -i"scripting/include" -i".temp/include" -o"plugins/${plugin}.smx" "scripting/${plugin}.sp"
           done
         working-directory: ${{ env.SCRIPTS_PATH }}
