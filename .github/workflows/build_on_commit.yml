@@ -28,31 +28,23 @@ jobs:
           version: "1.11.x"
           version-file: ./scripting/${{ env.PLUGIN_NAME_ENV }}.sp
       
-      - name: Download the includes downloader
-        run: |
-          gh release download --repo Zabaniya001/SPDependy --pattern "SPDependyLinux"
-          chmod +x SPDependyLinux
-        working-directory: ${{ env.SCRIPTS_PATH }}
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      
-      - name: Install the SourcePawn includes.
-        run: ./SPDependyLinux ${{ secrets.GITHUB_TOKEN }}
-        working-directory: ${{ env.SCRIPTS_PATH }}
-
-      - uses: actions/setup-python@v4
+      - name: Download SourcePawn plugin dependencies
+        uses: Zabaniya001/SPDependy@v1
         with:
-          python-version: '3.11'
+          github_token: '${{ secrets.GITHUB_TOKEN }}'
 
-      - name: Download toml parser
-        run: |
-          pip install jq
-          pip install yq
+      - name: Parse toml
+        uses: SebRollen/toml-action@v1.0.1
+        id: read_toml
+        with:
+          file: 'sp.toml'
+          field: 'Compile.plugins'
 
       - name: Compile plugins
         run: |
           mkdir plugins
-          for plugin in $(tomlq '.Compile.plugins[]' sp.toml | cut -d'"' -f2); do
+          my_array=$(echo ${{ toJSON(steps.read_toml.outputs.value) }} | jq -r '.[]')
+          for plugin in $my_array; do
             spcomp -w234 -O2 -v2 -i"scripting/include" -i".temp/include" -o"plugins/${plugin}.smx" "scripting/${plugin}.sp"
           done
         working-directory: ${{ env.SCRIPTS_PATH }}
