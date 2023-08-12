@@ -29,7 +29,7 @@ jobs:
           version-file: ./scripting/${{ env.PLUGIN_NAME_ENV }}.sp
       
       - name: Download SourcePawn plugin dependencies
-        uses: Zabaniya001/SPDependy@v1
+        uses: Zabaniya001/SPDependy@v2
         with:
           github_token: '${{ secrets.GITHUB_TOKEN }}'
 
